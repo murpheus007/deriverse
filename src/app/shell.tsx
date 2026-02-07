@@ -24,6 +24,11 @@ export function AppShell() {
       <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur">
         <div className="container-app flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
+            <img
+              src="/deriverse-favicon.ico"
+              alt="Deriverse logo"
+              className="h-10 w-10 rounded-xl border border-slate-800/60 bg-white/5 p-1"
+            />
             <div>
               <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Deriverse</p>
               <h1 className="text-2xl font-semibold">Deriverse Analytics</h1>
