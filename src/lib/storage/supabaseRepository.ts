@@ -111,7 +111,8 @@ export function createSupabaseRepository(
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
-      return (data ?? []).map(mapAccountRow);
+      const rows = (data ?? []) as Database["public"]["Tables"]["accounts"]["Row"][];
+      return rows.map(mapAccountRow);
     },
     async addAccount(input) {
       const userId = requireUserId(getUserId);
@@ -132,7 +133,7 @@ export function createSupabaseRepository(
         }
         throw new Error(error.message);
       }
-      return mapAccountRow(data);
+      return mapAccountRow(data as Database["public"]["Tables"]["accounts"]["Row"]);
     },
     async getFills(filters: FillFilters) {
       const userId = requireUserId(getUserId);
@@ -160,7 +161,8 @@ export function createSupabaseRepository(
 
       const { data, error } = await query;
       if (error) throw new Error(error.message);
-      return (data ?? []).map(mapFillRow);
+      const rows = (data ?? []) as Database["public"]["Tables"]["fills"]["Row"][];
+      return rows.map(mapFillRow);
     },
     async insertFills(importId: string | null, fills: TradeFillInsert[]) {
       const userId = requireUserId(getUserId);
@@ -245,7 +247,7 @@ export function createSupabaseRepository(
         .eq("fill_id", fillId)
         .maybeSingle();
       if (error) throw new Error(error.message);
-      return data ? mapAnnotationRow(data) : null;
+      return data ? mapAnnotationRow(data as Database["public"]["Tables"]["fill_annotations"]["Row"]) : null;
     },
     async upsertFillAnnotation(input) {
       const userId = requireUserId(getUserId);
@@ -262,7 +264,7 @@ export function createSupabaseRepository(
         .single();
 
       if (error) throw new Error(error.message);
-      return mapAnnotationRow(data);
+      return mapAnnotationRow(data as Database["public"]["Tables"]["fill_annotations"]["Row"]);
     },
     async listJournalEntries() {
       const userId = requireUserId(getUserId);
@@ -272,7 +274,7 @@ export function createSupabaseRepository(
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
-      const entries = data ?? [];
+      const entries = (data ?? []) as Database["public"]["Tables"]["journal_entries"]["Row"][];
       const ids = entries.map((row) => row.id);
       let assets: Database["public"]["Tables"]["journal_assets"]["Row"][] = [];
       if (ids.length > 0) {
@@ -282,7 +284,7 @@ export function createSupabaseRepository(
           .eq("user_id", userId)
           .in("journal_entry_id", ids);
         if (assetsResponse.error) throw new Error(assetsResponse.error.message);
-        assets = assetsResponse.data ?? [];
+        assets = (assetsResponse.data ?? []) as Database["public"]["Tables"]["journal_assets"]["Row"][];
       }
 
       const assetsByEntry = new Map<string, Database["public"]["Tables"]["journal_assets"]["Row"][]>();
@@ -315,29 +317,30 @@ export function createSupabaseRepository(
         .select("*")
         .single();
       if (error) throw new Error(error.message);
+      const entryRow = data as Database["public"]["Tables"]["journal_entries"]["Row"];
 
       await supabase
         .from("journal_assets")
         .delete()
         .eq("user_id", userId)
-        .eq("journal_entry_id", data.id);
+        .eq("journal_entry_id", entryRow.id);
 
       if (input.screenshotUrls.length > 0) {
         const assetRows = input.screenshotUrls.map((url) => ({
           user_id: userId,
-          journal_entry_id: data.id,
+          journal_entry_id: entryRow.id,
           url
         }));
         const assetInsert = await supabase.from("journal_assets").insert(assetRows);
         if (assetInsert.error) throw new Error(assetInsert.error.message);
       }
 
-      return mapJournalRow(data, input.screenshotUrls.map((url, idx) => ({
-        id: `${data.id}-${idx}`,
+      return mapJournalRow(entryRow, input.screenshotUrls.map((url, idx) => ({
+        id: `${entryRow.id}-${idx}`,
         user_id: userId,
-        journal_entry_id: data.id,
+        journal_entry_id: entryRow.id,
         url,
-        created_at: data.created_at
+        created_at: entryRow.created_at
       })));
     },
     async deleteJournalEntry(id) {
@@ -364,7 +367,7 @@ export function createSupabaseRepository(
         .select("*")
         .single();
       if (error) throw new Error(error.message);
-      return mapImportRow(data);
+      return mapImportRow(data as Database["public"]["Tables"]["imports"]["Row"]);
     },
     async markImportStatus(importId, status) {
       const userId = requireUserId(getUserId);
