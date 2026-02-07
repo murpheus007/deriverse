@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+
+  --app-bg: #f0ede9;                 /* warm off-white */
+  --surface: #f5f2ee;
+  --surface-muted: #ebe7e1;
+
+  --border: rgba(41, 37, 36, 0.14);
+
+  --text-strong: #1c1917;
+  --text: #292524;
+  --text-muted: #78716c;
+
+  --brand: #0f766e;                  /* teal */
+  --brand-2: #f59e0b;                /* amber */
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --app-bg: #0c0a09;
+  --surface: rgba(28, 25, 23, 0.78);
+  --surface-muted: rgba(28, 25, 23, 0.82);
+
+  --border: rgba(168, 162, 158, 0.14);
+
+  --text-strong: #fafaf9;
+  --text: #e7e5e4;
+  --text-muted: #a8a29e;
+
+  --brand: #2dd4bf;
+  --brand-2: #fbbf24;
+}
+
+.light body {
+  background: var(--app-bg);
+}
+
+
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% 0%, rgba(34, 197, 94, 0.1), transparent 62%),
+    radial-gradient(900px 600px at 100% 0%, rgba(190, 242, 100, 0.1), transparent 55%),
+    var(--app-bg);
+}
+
+.container-app {
+  @apply mx-auto w-full px-4 sm:px-6 lg:px-8;
+  max-width: 90rem;
+}
+
+.card {
+  @apply rounded-2xl backdrop-blur shadow-card;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.card-header {
+  @apply flex items-center justify-between gap-4 px-5 py-4;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-body {
+  @apply px-5 py-4;
+}
+
+.input {
+  @apply w-full rounded-xl px-3 py-2 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/60;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.label {
+  @apply text-xs font-medium uppercase tracking-wide text-slate-400;
+}
+
+.badge {
+  @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply btn bg-brand-500 text-white hover:bg-brand-400 shadow-glow;
+}
+
+.btn-secondary {
+  @apply btn;
+  background: var(--surface-muted);
+  color: var(--text);
+}
+
+.btn-ghost {
+  @apply btn bg-transparent;
+  color: var(--text);
+}
+
+.table-base {
+  @apply w-full text-left text-sm;
+}
+
+.table-base th {
+  @apply px-3 py-2 text-xs font-semibold uppercase tracking-wide;
+  color: var(--text-muted);
+}
+
+.table-base td {
+  @apply px-3 py-2;
+  color: var(--text);
+}
+
+.section-title {
+  @apply text-lg font-semibold;
+  color: var(--text-strong);
+}
+
+.toggle {
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+  color: var(--text);
+}
+
+.toggle-active {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.12);
+  color: #1d4ed8;
+}
+
+.dark .toggle-active {
+  color: #bfdbfe;
+}
+
+.toggle-track {
+  background: #cbd5f5;
+}
+
+.dark .toggle-track {
+  background: #334155;
+}
+
+.toggle-track-active {
+  background: #3b82f6;
+}
+
+.toggle-thumb {
+  background: #ffffff;
+}
+
+.light .text-slate-100 {
+  color: var(--text-strong) !important;
+}
+
+.light .text-slate-300 {
+  color: var(--text) !important;
+}
+
+.light .text-slate-400,
+.light .text-slate-500 {
+  color: var(--text-muted) !important;
+}
+
+.light .border-slate-800,
+.light .border-slate-700 {
+  border-color: var(--border) !important;
+}
+
+.light .bg-slate-950 {
+  background-color: var(--app-bg) !important;
+}
+
+.light .bg-slate-950\/80 {
+  background-color: rgba(248, 250, 252, 0.85) !important;
+}
+
+.light .bg-slate-900\/70,
+.light .bg-slate-900\/60 {
+  background-color: var(--surface) !important;
+}
+
+/* Add this once (works with any palette) */
+.nav-link {
+  color: var(--text);
+}
+.nav-link:hover {
+  color: var(--text-strong);
+}
+.nav-link.active {
+  color: var(--text-strong);
+  border-color: var(--border);
+}
+
+
+@media (max-width: 640px) {
+  .card-header {
+    @apply flex-col items-start;
+  }
+}
