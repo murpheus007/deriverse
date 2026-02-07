@@ -36,6 +36,7 @@ export type Database = {
           sync_error?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       imports: {
         Row: {
@@ -61,6 +62,7 @@ export type Database = {
         Update: {
           status?: "pending" | "processed" | "failed";
         };
+        Relationships: [];
       };
       fills: {
         Row: {
@@ -107,6 +109,7 @@ export type Database = {
           tags?: string[];
           raw?: unknown | null;
         };
+        Relationships: [];
       };
       fill_annotations: {
         Row: {
@@ -132,6 +135,7 @@ export type Database = {
           tags?: string[];
           updated_at?: string | null;
         };
+        Relationships: [];
       };
       journal_entries: {
         Row: {
@@ -173,6 +177,7 @@ export type Database = {
           custom_tags?: string[];
           updated_at?: string | null;
         };
+        Relationships: [];
       };
       journal_assets: {
         Row: {
@@ -192,6 +197,7 @@ export type Database = {
         Update: {
           url?: string;
         };
+        Relationships: [];
       };
     };
     Views: Record<string, never>;
