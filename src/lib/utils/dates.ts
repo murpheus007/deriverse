@@ -10,6 +10,10 @@ export function formatDateTime(ts: string): string {
   return new Date(ts).toLocaleString();
 }
 
+export function formatDateTimeShort(ts: string): string {
+  return new Date(ts).toLocaleString([], { dateStyle: "short", timeStyle: "short" });
+}
+
 export function startOfDay(ts: string): string {
   const date = new Date(ts);
   date.setHours(0, 0, 0, 0);

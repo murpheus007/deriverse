@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-table";
 import type { TradeFill, DerivedTrade } from "../../types/trades";
 import { formatCurrency, formatNumber, formatPct } from "../../lib/utils/format";
+import { formatDateTimeShort } from "../../lib/utils/dates";
 
 export type TradeTableMode = "fills" | "derived";
 
@@ -41,7 +42,11 @@ export function TradesTable({
   const columns = useMemo<ColumnDef<FillRow | DerivedRow>[]>(() => {
     if (mode === "fills") {
       return [
-        { accessorKey: "ts", header: "Timestamp" },
+        {
+          accessorKey: "ts",
+          header: "Timestamp",
+          cell: (info) => formatDateTimeShort(String(info.getValue()))
+        },
         { accessorKey: "symbol", header: "Symbol" },
         { accessorKey: "marketType", header: "Market" },
         { accessorKey: "side", header: "Side" },
@@ -65,7 +70,11 @@ export function TradesTable({
     }
 
     return [
-      { accessorKey: "closeTs", header: "Close" },
+      {
+        accessorKey: "closeTs",
+        header: "Close",
+        cell: (info) => formatDateTimeShort(String(info.getValue()))
+      },
       { accessorKey: "symbol", header: "Symbol" },
       { accessorKey: "side", header: "Side" },
       {

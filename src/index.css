@@ -134,12 +134,12 @@ body {
 }
 
 .table-base th {
-  @apply px-3 py-2 text-xs font-semibold uppercase tracking-wide;
+  @apply px-2 py-2 text-xs font-semibold uppercase tracking-wide;
   color: var(--text-muted);
 }
 
 .table-base td {
-  @apply px-3 py-2;
+  @apply px-2 py-2;
   color: var(--text);
 }
 
