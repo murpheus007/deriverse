@@ -3,6 +3,7 @@ import { useThemeStore } from "./themeStore";
 import { Toggle } from "../components/ui/Toggle";
 import { Button } from "../components/ui/Button";
 import { useAuth } from "./authProvider";
+import { WalletButton } from "../components/ui/WalletButton";
 import { useStorageRepository } from "../lib/storage/repositories";
 
 const navItems = [
@@ -43,11 +44,7 @@ export function AppShell() {
               checked={theme === "dark"}
               onChange={toggleTheme}
             />
-            {authEnabled && (
-              <Button variant="secondary" onClick={() => signOut()}>
-                Logout
-              </Button>
-            )}
+            <WalletButton />
           </div>
         </div>
       </header>

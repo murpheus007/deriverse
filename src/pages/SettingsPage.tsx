@@ -15,6 +15,7 @@ import {
 import { generateMockFills } from "../data/mock";
 import { parseTradeFillsCsv, buildCsvTemplate } from "../lib/csv/validate";
 import { useStorageRepository } from "../lib/storage/repositories";
+import { useAuth } from "../app/authProvider";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useActiveAccountStore } from "../lib/storage/activeAccount";
 import { MockSyncProvider } from "../lib/sync/provider";
@@ -24,6 +25,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export function SettingsPage() {
   const { repository } = useStorageRepository();
+  const { signOut, authEnabled } = useAuth();
   const { data: fills = [] } = useFills({ limit: 10000 });
   const { data: journal = [] } = useJournalEntries();
   const { data: accounts = [] } = useAccounts();
@@ -295,6 +297,14 @@ export function SettingsPage() {
               <p className="label">Fills stored</p>
               <p className="text-sm text-slate-300">{fills.length} fills stored</p>
             </div>
+            {authEnabled && (
+              <div className="md:col-span-2">
+                <p className="label">Account</p>
+                <Button variant="secondary" onClick={() => signOut()}>
+                  Logout
+                </Button>
+              </div>
+            )}
           </div>
         </CardBody>
       </Card>
