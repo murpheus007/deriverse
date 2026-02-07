@@ -46,7 +46,7 @@ export function createLocalRepository(getUserId: () => string | null): StorageRe
       writeStorage(ACCOUNTS_KEY, [next, ...accounts]);
       return next;
     },
-    async getFills(filters) {
+    async getFills(filters: FillFilters) {
       const fills = readStorage<TradeFill[]>(FILLS_KEY, []);
       const filtered = applyFillFiltersLocal(fills, filters);
       const sorted = filtered.sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime());
@@ -54,7 +54,7 @@ export function createLocalRepository(getUserId: () => string | null): StorageRe
       const offset = filters.offset ?? 0;
       return sorted.slice(offset, offset + limit);
     },
-    async insertFills(importId, fills) {
+    async insertFills(importId: string | null, fills: TradeFillInsert[]) {
       const existing = readStorage<TradeFill[]>(FILLS_KEY, []);
       const keySet = new Set(
         existing.map((fill) => `${fill.accountId}-${fill.txSig}-${fill.eventId ?? ""}`)
@@ -123,7 +123,7 @@ export function createLocalRepository(getUserId: () => string | null): StorageRe
     async listJournalEntries() {
       return readStorage<JournalEntry[]>(JOURNAL_KEY, []);
     },
-    async upsertJournalEntry(input) {
+    async upsertJournalEntry(input: JournalEntryUpsert) {
       const entries = readStorage<JournalEntry[]>(JOURNAL_KEY, []);
       const now = new Date().toISOString();
       const nextEntry: JournalEntry = {

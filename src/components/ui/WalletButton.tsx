@@ -1,4 +1,5 @@
-import { useWallet, type WalletName } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import type { WalletName } from "@solana/wallet-adapter-base";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Button } from "./Button";
 

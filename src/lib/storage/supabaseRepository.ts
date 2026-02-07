@@ -134,7 +134,7 @@ export function createSupabaseRepository(
       }
       return mapAccountRow(data);
     },
-    async getFills(filters) {
+    async getFills(filters: FillFilters) {
       const userId = requireUserId(getUserId);
       // Note: pagination can be added later via range() or cursor-based queries.
       let query = supabase
@@ -162,7 +162,7 @@ export function createSupabaseRepository(
       if (error) throw new Error(error.message);
       return (data ?? []).map(mapFillRow);
     },
-    async insertFills(importId, fills) {
+    async insertFills(importId: string | null, fills: TradeFillInsert[]) {
       const userId = requireUserId(getUserId);
       let inserted = 0;
       let skipped = 0;
@@ -196,7 +196,7 @@ export function createSupabaseRepository(
 
       return { inserted, skipped };
     },
-    async insertFillsIdempotent(accountId, fills) {
+    async insertFillsIdempotent(accountId: string | null, fills: TradeFillInsert[]) {
       const userId = requireUserId(getUserId);
       let inserted = 0;
       let skipped = 0;
@@ -293,7 +293,7 @@ export function createSupabaseRepository(
 
       return entries.map((row) => mapJournalRow(row, assetsByEntry.get(row.id) ?? []));
     },
-    async upsertJournalEntry(input) {
+    async upsertJournalEntry(input: JournalEntryUpsert) {
       const userId = requireUserId(getUserId);
       const payload: Database["public"]["Tables"]["journal_entries"]["Insert"] = {
         id: input.id,
