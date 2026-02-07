@@ -71,18 +71,22 @@ body {
 }
 
 .card {
-  @apply rounded-2xl backdrop-blur shadow-card;
+  @apply rounded-2xl backdrop-blur shadow-card w-full;
   background: var(--surface);
   border: 1px solid var(--border);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .card-header {
   @apply flex items-center justify-between gap-4 px-5 py-4;
   border-bottom: 1px solid var(--border);
+  min-width: 0;
 }
 
 .card-body {
   @apply px-5 py-4;
+  min-width: 0;
 }
 
 .input {

@@ -9,8 +9,8 @@ export function SymbolTable({ rows }: { rows: { symbol: string; pnl: number; win
           <p className="text-xs text-slate-400">Sortable breakdown</p>
         </div>
       </CardHeader>
-      <CardBody>
-        <table className="table-base">
+      <CardBody className="max-w-full overflow-x-auto">
+        <table className="table-base min-w-[560px]">
           <thead>
             <tr>
               <th>Symbol</th>
