@@ -19,8 +19,8 @@ export function PortfolioPage() {
             <p className="text-xs text-slate-400">Allocation derived from historical fills</p>
           </div>
         </CardHeader>
-        <CardBody>
-          <table className="table-base">
+        <CardBody className="max-w-full overflow-x-auto">
+          <table className="table-base min-w-[520px]">
             <thead>
               <tr>
                 <th>Symbol</th>

@@ -111,8 +111,8 @@ export function TradesTable({
   });
 
   return (
-    <div className="max-w-full overflow-x-auto">
-      <table className="table-base min-w-[720px]">
+    <div className="w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain">
+      <table className="table-base min-w-[860px]">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>

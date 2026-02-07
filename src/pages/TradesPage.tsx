@@ -50,7 +50,7 @@ export function TradesPage() {
   return (
     <div className="space-y-6">
       <FiltersBar filters={filters} onChange={updateFilters} onReset={resetFilters} symbols={symbols} />
-      <div className="card p-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="card min-w-0 p-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-wrap gap-2">
           <Button
             variant={mode === "fills" ? "primary" : "secondary"}
@@ -75,7 +75,7 @@ export function TradesPage() {
           <Input placeholder="Search trades" value={search} onChange={(event) => setSearch(event.target.value)} />
         </div>
       </div>
-      <div className="card p-4">
+      <div className="card min-w-0 overflow-x-hidden p-4">
         <TradesTable
           fills={fills}
           derived={pagedDerived}

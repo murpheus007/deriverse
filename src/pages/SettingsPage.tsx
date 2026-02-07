@@ -171,9 +171,9 @@ export function SettingsPage() {
             <div className="mt-3 space-y-3 text-sm text-slate-300">
               {accounts.length === 0 && <span>No wallets linked yet.</span>}
               {accounts.map((account) => (
-                <div key={account.id} className="flex flex-col gap-2 rounded-xl border border-slate-800/60 p-3 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <p className="font-semibold text-slate-100">
+                <div key={account.id} className="flex min-w-0 flex-col gap-2 rounded-xl border border-slate-800/60 p-3 md:flex-row md:items-center md:justify-between">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-slate-100 break-words">
                       {account.label ?? shortAddress(account.walletAddress)}
                     </p>
                     <p className="text-xs text-slate-400">
@@ -221,7 +221,9 @@ export function SettingsPage() {
               ))}
             </Select>
             {activeAccount && (
-              <p className="mt-1 text-xs text-slate-400">Active: {activeAccount.label ?? activeAccount.walletAddress}</p>
+              <p className="mt-1 text-xs text-slate-400 break-words">
+                Active: {activeAccount.label ?? activeAccount.walletAddress}
+              </p>
             )}
           </div>
         </CardBody>
