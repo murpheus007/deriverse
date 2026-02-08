@@ -58,7 +58,7 @@ export function AppShell() {
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
-                    `rounded-xl px-3 py-2 text-sm font-medium transition ${
+                    `rounded-md px-3 py-2 text-sm font-medium transition ${
                       isActive
                         ? theme === "dark"
                           ? "bg-brand-500/20 text-brand-200"

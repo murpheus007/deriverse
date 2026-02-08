@@ -120,7 +120,7 @@ export function TradesTable({
   });
 
   return (
-    <div className="w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain">
+    <div className="table-scroll">
       <table className="table-base min-w-[860px]">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (

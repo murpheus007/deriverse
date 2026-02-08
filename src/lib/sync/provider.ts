@@ -17,19 +17,33 @@ function seededValue(seed: string, index: number) {
   return Math.abs(hash) % 1000;
 }
 
-const symbols = ["SOL/USDC", "DRV/USDC", "JUP/USDC", "BONK/USDC"];
+const symbols = ["SOL/USDC", "DRV/USDC", "JUP/USDC", "BONK/USDC", "RNDR/USDC"];
+const marketTypes: Array<"spot" | "perp" | "options"> = ["spot", "perp", "options"];
+const sides: Array<"long" | "short"> = ["long", "short"];
+const orderTypes: Array<"market" | "limit" | "stop" | "other"> = ["market", "limit", "stop", "other"];
+const feeTypes: Array<"maker" | "taker" | "funding" | "other"> = ["maker", "taker", "funding", "other"];
+
+function seededPick<T>(items: T[], seed: string, index: number): T {
+  return items[seededValue(seed, index) % items.length];
+}
 
 export class MockSyncProvider implements TradeSyncProvider {
   async fetchNewFills(walletAddress: string, cursor: Cursor) {
-    const baseTime = cursor.lastSyncedAt ? new Date(cursor.lastSyncedAt).getTime() : Date.now() - 3600_000;
+    const spreadDays = 21;
+    const baseTime = cursor.lastSyncedAt
+      ? new Date(cursor.lastSyncedAt).getTime()
+      : Date.now() - spreadDays * 24 * 60 * 60 * 1000;
     const count = 20;
     const fills: FetchedFill[] = [];
+    let currentTime = baseTime;
 
     for (let i = 0; i < count; i += 1) {
-      const ts = new Date(baseTime + (i + 1) * 60_000).toISOString();
-      const symbol = symbols[i % symbols.length];
-      const side = i % 2 === 0 ? "long" : "short";
-      const marketType = i % 3 === 0 ? "spot" : "perp";
+      const gapMinutes = 30 + (seededValue(walletAddress, i + 17) % (24 * 60));
+      currentTime += gapMinutes * 60_000;
+      const ts = new Date(currentTime).toISOString();
+      const symbol = seededPick(symbols, walletAddress, i + 1);
+      const side = seededPick(sides, walletAddress, i + 3);
+      const marketType = seededPick(marketTypes, walletAddress, i + 5);
       const qtySeed = seededValue(walletAddress, i) / 1000;
       const priceSeed = seededValue(walletAddress, i + 7) / 1000;
       const feeSeed = seededValue(walletAddress, i + 13) / 1000;
@@ -48,8 +62,8 @@ export class MockSyncProvider implements TradeSyncProvider {
         qty,
         price,
         fee,
-        fee_type: "taker",
-        order_type: i % 2 === 0 ? "market" : "limit",
+        fee_type: seededPick(feeTypes, walletAddress, i + 11),
+        order_type: seededPick(orderTypes, walletAddress, i + 9),
         tx_sig: txSig,
         event_id,
         raw: { source: "mock", walletAddress },

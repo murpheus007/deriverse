@@ -75,7 +75,7 @@ export function TradesPage() {
           <Input placeholder="Search trades" value={search} onChange={(event) => setSearch(event.target.value)} />
         </div>
       </div>
-      <div className="card min-w-0 overflow-x-hidden p-4">
+      <div className="card min-w-0 p-4">
         <TradesTable
           fills={fills}
           derived={pagedDerived}
