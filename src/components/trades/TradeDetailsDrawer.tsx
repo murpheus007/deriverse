@@ -27,12 +27,6 @@ export function TradeDetailsDrawer({
     setTags(annotation?.tags.join(", ") ?? "");
   }, [annotation, trade]);
 
-  const derivedTitle = useMemo(() => {
-    if (!trade) return "Trade";
-    const symbol = "symbol" in trade ? trade.symbol : "Trade";
-    return `${symbol} Annotation`;
-  }, [trade]);
-
   if (!trade) return null;
   const isFill = "ts" in trade;
   const title = isFill ? `${trade.symbol} Fill` : `${trade.symbol} Trade`;

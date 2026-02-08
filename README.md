@@ -1,6 +1,8 @@
-﻿# Deriverse Analytics
+# Deriverse Analytics
 
 A production-quality trading analytics and journal dashboard for the Deriverse Solana ecosystem. This build prioritizes correctness, auditability, and a pluggable ingestion pipeline while keeping the UI fast and deterministic.
+
+**New flow:** the app opens in **Demo Mode** (local mock data) for first-time visitors. Wallet connection is encouraged but not required to explore the UI.
 
 ## Bounty Alignment
 Implemented features mapped to the requested scope:
@@ -33,10 +35,10 @@ Implemented features mapped to the requested scope:
 ## Architecture
 ```
 UI
- └─ Query/State (TanStack Query + Zustand)
-     └─ Repository (Supabase | Local)
-         ├─ Analytics (pure functions)
-         └─ Ingestion (CSV | Mock Sync)
+ +- Query/State (TanStack Query + Zustand)
+     +- Repository (Supabase | Local)
+         +- Analytics (pure functions)
+         +- Ingestion (CSV | Mock Sync)
 ```
 
 ## Getting Started
@@ -44,6 +46,11 @@ UI
 npm install
 npm run dev
 ```
+
+## Demo Mode (Local)
+- First visit with no linked wallet seeds **100 mock fills** into localStorage.
+- You can explore all analytics, charts, and journal UI without connecting.
+- A tooltip guide in the header invites you to connect a wallet when ready.
 
 ## Supabase Setup (Wallet Auth + Data)
 1. Create a Supabase project.
@@ -65,6 +72,24 @@ npm run dev
 - Enable sync for the linked wallet in Settings.
 - Sync inserts are labeled as `source_type = 'mock'` in `imports` for auditability.
 
+## Troubleshooting
+- **Invalid JWT from Edge Functions**: ensure the client is using the correct `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, then redeploy functions. Verify `supabase/config.toml` has function config blocks (CLI 2.75+):
+  ```
+  [functions.create-nonce]
+  verify_jwt = false
+
+  [functions.verify-wallet-link]
+  verify_jwt = false
+  ```
+- **401/Unauthorized from functions**: confirm function secrets are set in Supabase Functions env (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) and redeploy.
+- **Wallet signature button disabled**: ensure the wallet is connected in the browser extension and the address matches the wallet you intend to link.
+- **No data showing**: if in Demo Mode, clear `da_demo_seeded` + `da_fills` in localStorage and refresh to reseed.
+
+## UI Notes
+- **Trades**: on mobile, trades render as compact cards; full table remains on desktop.
+- **Portfolio**: mobile card layout for allocations; full table on desktop.
+- **Performance cues**: PnL and allocation values are color-coded (profit vs loss).
+
 ## Scripts
 - `npm run dev` - start dev server
 - `npm run build` - build production bundle
@@ -83,7 +108,7 @@ npm run dev
 - **Design system**: `src/components/ui` includes reusable cards, inputs, buttons, badges, and drawers.
 
 ## Local Persistence (fallback)
-- When Supabase env vars are missing, the app falls back to localStorage (`da_fills`, `da_journal`, `da_annotations`).
+- When Supabase env vars are missing **or** no wallet is linked, the app uses localStorage (`da_fills`, `da_journal`, `da_annotations`).
 
 ## Future Work (Not in Scope)
 - Replace mock sync with a real Deriverse event decoder or indexer pipeline.

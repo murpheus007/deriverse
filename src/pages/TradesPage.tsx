@@ -26,12 +26,8 @@ export function TradesPage() {
     const media = window.matchMedia("(max-width: 768px)");
     const update = () => setIsCompact(media.matches);
     update();
-    if ("addEventListener" in media) {
-      media.addEventListener("change", update);
-      return () => media.removeEventListener("change", update);
-    }
-    media.addListener(update);
-    return () => media.removeListener(update);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
   }, []);
 
   const { accountId } = useActiveAccountStore();
