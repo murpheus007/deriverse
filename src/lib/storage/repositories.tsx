@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo } from "react";
 import type { Account, ImportRow } from "../../types/db";
 import type {
   FillAnnotation,
@@ -11,6 +11,8 @@ import { supabase, supabaseEnabled } from "../supabase/client";
 import { useAuth } from "../../app/authProvider";
 import { createLocalRepository } from "./localRepository";
 import { createSupabaseRepository } from "./supabaseRepository";
+import { readStorage } from "./localStorage";
+import { generateMockFills } from "../../data/mock";
 
 export interface StorageRepository {
   getAccounts(): Promise<Account[]>;
@@ -34,6 +36,7 @@ export interface StorageRepository {
     source_label?: string;
     file_hash?: string;
     account_id?: string | null;
+    wallet_id?: string | null;
   }): Promise<ImportRow>;
   markImportStatus(importId: string, status: "processed" | "failed"): Promise<void>;
   updateAccountSyncState(
@@ -57,8 +60,10 @@ type StorageContextValue = {
 const StorageContext = createContext<StorageContextValue | null>(null);
 
 export function StorageProvider({ children }: { children: React.ReactNode }) {
-  const { userId } = useAuth();
-  const mode: RepositoryMode = supabaseEnabled && supabase ? "supabase" : "local";
+  const { userId, linkedWallets } = useAuth();
+  const hasLinkedWallet = linkedWallets.length > 0;
+  const mode: RepositoryMode =
+    supabaseEnabled && supabase && hasLinkedWallet ? "supabase" : "local";
 
   const repository = useMemo<StorageRepository>(() => {
     const getUserId = () => userId;
@@ -67,6 +72,42 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
     }
     return createLocalRepository(getUserId);
   }, [mode, userId]);
+
+  useEffect(() => {
+    if (mode !== "local") return;
+    const seededFlag = localStorage.getItem("da_demo_seeded");
+    if (seededFlag === "1") return;
+    const existing = readStorage<TradeFill[]>("da_fills", []);
+    if (existing.length > 0) {
+      localStorage.setItem("da_demo_seeded", "1");
+      return;
+    }
+
+    const seed = generateMockFills(50).map((fill) => ({
+      ts: fill.ts,
+      symbol: fill.symbol,
+      marketType: fill.marketType,
+      side: fill.side,
+      qty: fill.qty,
+      price: fill.price,
+      fee: fill.fee,
+      feeType: fill.feeType,
+      orderType: fill.orderType,
+      txSig: fill.txSig,
+      raw: { source: "demo" },
+      tags: [...(fill.tags ?? []), "demo"]
+    }));
+
+    (async () => {
+      const importRow = await repository.createImport({
+        source_type: "mock",
+        source_label: "Demo seed"
+      });
+      await repository.insertFills(importRow.id, seed);
+      await repository.markImportStatus(importRow.id, "processed");
+      localStorage.setItem("da_demo_seeded", "1");
+    })();
+  }, [mode, repository]);
 
   return (
     <StorageContext.Provider value={{ repository, mode }}>{children}</StorageContext.Provider>

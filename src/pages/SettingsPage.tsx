@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { Card, CardBody, CardHeader } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
 import { Select } from "../components/ui/Select";
 import { Toast } from "../components/ui/Toast";
-import { WalletButton } from "../components/ui/WalletButton";
+import { Toggle } from "../components/ui/Toggle";
 import {
   useAccounts,
   useAddAccount,
@@ -22,18 +23,21 @@ import { MockSyncProvider } from "../lib/sync/provider";
 import { runAccountSync } from "../lib/sync/runSync";
 import { formatDateTime } from "../lib/utils/dates";
 import { useQueryClient } from "@tanstack/react-query";
+import { useThemeStore } from "../app/themeStore";
 
 export function SettingsPage() {
   const { repository } = useStorageRepository();
-  const { signOut, authEnabled } = useAuth();
+  const { signOut, primaryWallet, linkedWallets } = useAuth();
   const { data: fills = [] } = useFills({ limit: 10000 });
   const { data: journal = [] } = useJournalEntries();
   const { data: accounts = [] } = useAccounts();
   const queryClient = useQueryClient();
   const addAccount = useAddAccount();
   const importCsv = useImportCsv();
-  const { publicKey } = useWallet();
+  const { disconnect } = useWallet();
   const { accountId, setAccountId } = useActiveAccountStore();
+  const { theme, toggleTheme } = useThemeStore();
+  const navigate = useNavigate();
   const [csvErrors, setCsvErrors] = useState<{ row: number; field: string; message: string }[]>([]);
   const [fileName, setFileName] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -57,9 +61,10 @@ export function SettingsPage() {
         orderType: fill.orderType,
         txSig: fill.txSig,
         tags: fill.tags,
-        accountId
+        accountId,
+        walletId: primaryWallet?.walletId ?? null
       })),
-      meta: { source_type: "manual", source_label: "seed", account_id: accountId }
+      meta: { source_type: "manual", source_label: "seed", account_id: accountId, wallet_id: primaryWallet?.walletId ?? null }
     });
   };
 
@@ -85,8 +90,8 @@ export function SettingsPage() {
       setCsvErrors([]);
       importCsv.mutate(
         {
-          fills: result.fills.map((fill) => ({ ...fill, accountId })),
-          meta: { source_type: "csv", source_label: file.name, account_id: accountId }
+          fills: result.fills.map((fill) => ({ ...fill, accountId, walletId: primaryWallet?.walletId ?? null })),
+          meta: { source_type: "csv", source_label: file.name, account_id: accountId, wallet_id: primaryWallet?.walletId ?? null }
         },
         {
           onSuccess: (summary) => {
@@ -101,11 +106,15 @@ export function SettingsPage() {
   };
 
   const template = useMemo(() => buildCsvTemplate(), []);
-  const linkedWallet = publicKey?.toBase58();
+  const walletAddress = primaryWallet?.address ?? null;
   const linkedAddresses = useMemo(() => new Set(accounts.map((acct) => acct.walletAddress)), [accounts]);
-  const linkedAccount = accounts.find((acct) => acct.walletAddress === linkedWallet) ?? null;
+  const linkedAccount = accounts.find((acct) => acct.walletAddress === walletAddress) ?? null;
   const activeAccount = accounts.find((acct) => acct.id === accountId);
   const shortAddress = (address: string) => `${address.slice(0, 4)}...${address.slice(-4)}`;
+  const walletIdByAddress = useMemo(
+    () => new Map(linkedWallets.map((wallet) => [wallet.address, wallet.walletId])),
+    [linkedWallets]
+  );
   const statusClasses = (status?: string | null) => {
     switch (status) {
       case "syncing":
@@ -124,48 +133,81 @@ export function SettingsPage() {
       <Card>
         <CardHeader>
           <div>
-            <p className="section-title">Wallets</p>
-            <p className="text-xs text-slate-400">Connect a wallet and sync trading activity.</p>
+            <p className="section-title">Connected wallet</p>
+            <p className="text-xs text-slate-400">Wallet-based authentication and sync.</p>
           </div>
-          <span className="badge text-[11px] uppercase tracking-wide">
-            Demo Mode: mock sync
-          </span>
+          <span className="badge text-[11px] uppercase tracking-wide">Demo Mode: mock sync</span>
         </CardHeader>
         <CardBody className="space-y-4">
           <div className="rounded-xl border border-amber-500/40 bg-amber-500/15 px-4 py-3 text-xs text-amber-900 dark:text-amber-100">
             Demo Mode: Sync uses mock fills (idempotent). Live Deriverse sync is pluggable and planned.
           </div>
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <WalletButton />
-            {linkedWallet && (
-              <div className="flex flex-1 flex-col gap-2 md:flex-row md:items-center md:justify-end">
-                {!linkedAccount?.label && (
-                  <div className="w-full md:max-w-xs">
-                    <p className="label">Label (optional)</p>
-                    <Input value={accountLabel} onChange={(event) => setAccountLabel(event.target.value)} />
-                  </div>
-                )}
-                <Button
-                  variant="secondary"
-                  onClick={() =>
-                    addAccount.mutate(
-                      { chain: "solana", wallet_address: linkedWallet, label: accountLabel || undefined },
-                      {
-                        onSuccess: (account) => {
-                          setMessage(`Wallet ${account.walletAddress} linked.`);
-                          setAccountLabel("");
-                        },
-                        onError: (err) => setError(err instanceof Error ? err.message : "Failed to link wallet.")
-                      }
-                    )
-                  }
-                  disabled={linkedAddresses.has(linkedWallet)}
-                >
-                  {linkedAddresses.has(linkedWallet) ? "Wallet linked" : "Link this wallet"}
-                </Button>
-              </div>
-            )}
+            <div className="text-sm text-slate-300">
+              {walletAddress ? (
+                <div>
+                  <p className="font-semibold text-slate-100">{shortAddress(walletAddress)}</p>
+                  <p className="text-xs text-slate-400">Primary wallet</p>
+                </div>
+              ) : (
+                <p>No wallet linked yet.</p>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="secondary" disabled>
+                Link another wallet (soon)
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  await disconnect();
+                  await signOut();
+                  navigate("/connect");
+                }}
+              >
+                Disconnect
+              </Button>
+            </div>
           </div>
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div>
+            <p className="section-title">Wallets & Sync</p>
+            <p className="text-xs text-slate-400">Link wallets for sync and filtering.</p>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          {walletAddress && (
+            <div className="flex flex-1 flex-col gap-2 md:flex-row md:items-center md:justify-between">
+              {!linkedAccount?.label && (
+                <div className="w-full md:max-w-xs">
+                  <p className="label">Label (optional)</p>
+                  <Input value={accountLabel} onChange={(event) => setAccountLabel(event.target.value)} />
+                </div>
+              )}
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  addAccount.mutate(
+                    { chain: "solana", wallet_address: walletAddress, label: accountLabel || undefined },
+                    {
+                      onSuccess: (account) => {
+                        setMessage(`Wallet ${account.walletAddress} linked for sync.`);
+                        setAccountLabel("");
+                      },
+                      onError: (err) => setError(err instanceof Error ? err.message : "Failed to link wallet.")
+                    }
+                  )
+                }
+                disabled={linkedAddresses.has(walletAddress)}
+              >
+                {linkedAddresses.has(walletAddress) ? "Wallet linked" : "Enable sync for this wallet"}
+              </Button>
+            </div>
+          )}
           <div>
             <p className="label">Linked Wallets</p>
             <div className="mt-3 space-y-3 text-sm text-slate-300">
@@ -192,7 +234,8 @@ export function SettingsPage() {
                       setSyncingAccountId(account.id);
                       try {
                         const provider = new MockSyncProvider();
-                        const result = await runAccountSync(account, provider, repository);
+                        const walletId = walletIdByAddress.get(account.walletAddress) ?? null;
+                        const result = await runAccountSync(account, provider, repository, walletId);
                         setMessage(`Synced ${result.inserted} fills (${result.skipped} skipped).`);
                         await queryClient.invalidateQueries({ queryKey: ["accounts"] });
                         await queryClient.invalidateQueries({ queryKey: ["fills"] });
@@ -228,6 +271,7 @@ export function SettingsPage() {
           </div>
         </CardBody>
       </Card>
+
       <Card>
         <CardHeader>
           <div>
@@ -292,6 +336,14 @@ export function SettingsPage() {
         <CardBody>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
+              <p className="label">Theme</p>
+              <Toggle label="Dark Mode" checked={theme === "dark"} onChange={toggleTheme} />
+            </div>
+            <div>
+              <p className="label">Linked wallets</p>
+              <p className="text-sm text-slate-300">{linkedWallets.length} connected</p>
+            </div>
+            <div>
               <p className="label">Journal entries</p>
               <p className="text-sm text-slate-300">{journal.length} entries stored</p>
             </div>
@@ -299,14 +351,6 @@ export function SettingsPage() {
               <p className="label">Fills stored</p>
               <p className="text-sm text-slate-300">{fills.length} fills stored</p>
             </div>
-            {authEnabled && (
-              <div className="md:col-span-2">
-                <p className="label">Account</p>
-                <Button variant="secondary" onClick={() => signOut()}>
-                  Logout
-                </Button>
-              </div>
-            )}
           </div>
         </CardBody>
       </Card>

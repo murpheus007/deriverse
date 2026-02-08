@@ -1,4 +1,4 @@
-import type { StorageRepository } from "./repositories";
+﻿import type { StorageRepository } from "./repositories";
 import { readStorage, writeStorage } from "./localStorage";
 import type { Account, ImportRow } from "../../types/db";
 import type { FillAnnotation, FillFilters, TradeFill, TradeFillInsert } from "../../types/trades";
@@ -75,6 +75,7 @@ export function createLocalRepository(getUserId: () => string | null): StorageRe
           id: buildId("fill"),
           importId,
           accountId: fill.accountId ?? null,
+          walletId: fill.walletId ?? null,
           ts: fill.ts,
           symbol: fill.symbol,
           marketType: fill.marketType,
@@ -131,6 +132,7 @@ export function createLocalRepository(getUserId: () => string | null): StorageRe
         createdAt: input.id ? entries.find((e) => e.id === input.id)?.createdAt ?? now : now,
         tradeRef: input.tradeRef,
         accountId: input.accountId ?? null,
+        walletId: input.walletId ?? null,
         title: input.title,
         strategyTag: input.strategyTag,
         mood: input.mood,
@@ -163,6 +165,7 @@ export function createLocalRepository(getUserId: () => string | null): StorageRe
         sourceLabel: meta.source_label ?? null,
         fileHash: meta.file_hash ?? null,
         accountId: meta.account_id ?? null,
+        walletId: meta.wallet_id ?? null,
         status: "pending",
         createdAt: new Date().toISOString()
       };
@@ -194,3 +197,4 @@ export function createLocalRepository(getUserId: () => string | null): StorageRe
     }
   };
 }
+

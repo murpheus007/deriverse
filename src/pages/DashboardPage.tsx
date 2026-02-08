@@ -43,11 +43,21 @@ export function DashboardPage() {
     <div className="space-y-6">
       <FiltersBar filters={filters} onChange={updateFilters} onReset={resetFilters} symbols={symbols} />
       <div className="grid gap-4 2xl:grid-cols-5">
-        <KpiCard label="Total PnL" value={formatCurrency(pnl.pnl)} sub={formatPct(pnl.pnlPct)} />
+        <KpiCard
+          label="Total PnL"
+          value={formatCurrency(pnl.pnl)}
+          sub={formatPct(pnl.pnlPct)}
+          tone={pnl.pnl >= 0 ? "positive" : "negative"}
+        />
         <KpiCard label="Win Rate" value={formatPct(wins.winRate)} sub={`${wins.wins}/${wins.tradeCount} trades`} />
         <KpiCard label="Trades" value={formatNumber(wins.tradeCount)} sub={`${wins.wins} wins`} />
         <KpiCard label="Fees" value={formatCurrency(volumeFees.feeTotal)} sub="All fee types" />
-        <KpiCard label="Max Drawdown" value={formatCurrency(drawdown.maxDrawdown)} sub="Peak to trough" />
+        <KpiCard
+          label="Max Drawdown"
+          value={formatCurrency(drawdown.maxDrawdown)}
+          sub="Peak to trough"
+          tone={drawdown.maxDrawdown < 0 ? "negative" : "neutral"}
+        />
       </div>
       <div className="grid gap-6 2xl:grid-cols-2">
         <PnlChart equity={equity} drawdown={drawdown.series} />

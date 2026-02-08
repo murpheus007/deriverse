@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+﻿import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AppShell } from "./shell";
 import { RequireAuth } from "./RequireAuth";
 import { DashboardPage } from "../pages/DashboardPage";
@@ -6,12 +6,13 @@ import { TradesPage } from "../pages/TradesPage";
 import { JournalPage } from "../pages/JournalPage";
 import { PortfolioPage } from "../pages/PortfolioPage";
 import { SettingsPage } from "../pages/SettingsPage";
-import { LoginPage } from "../pages/LoginPage";
+import { ConnectWalletPage } from "../pages/ConnectWalletPage";
+import { CalendarPage } from "../pages/CalendarPage";
 
 const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <LoginPage />
+    path: "/connect",
+    element: <ConnectWalletPage />
   },
   {
     path: "/",
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
       { path: "trades", element: <TradesPage /> },
       { path: "journal", element: <JournalPage /> },
       { path: "portfolio", element: <PortfolioPage /> },
+      { path: "calendar", element: <CalendarPage /> },
       { path: "settings", element: <SettingsPage /> }
     ]
   }
@@ -33,3 +35,5 @@ const router = createBrowserRouter([
 export function AppRouter() {
   return <RouterProvider router={router} />;
 }
+
+

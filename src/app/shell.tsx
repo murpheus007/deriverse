@@ -1,24 +1,60 @@
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useThemeStore } from "./themeStore";
-import { Toggle } from "../components/ui/Toggle";
-import { Button } from "../components/ui/Button";
-import { useAuth } from "./authProvider";
-import { WalletButton } from "../components/ui/WalletButton";
+import { WalletStatusPill } from "../components/ui/WalletStatusPill";
 import { useStorageRepository } from "../lib/storage/repositories";
+import { useAuth } from "./authProvider";
+import { useAccounts } from "../lib/storage/hooks";
+import { useActiveAccountStore } from "../lib/storage/activeAccount";
 
 const navItems = [
   { to: "/", label: "Dashboard" },
   { to: "/trades", label: "Trades" },
   { to: "/journal", label: "Journal" },
   { to: "/portfolio", label: "Portfolio" },
+  { to: "/calendar", label: "Calendar" },
   { to: "/settings", label: "Settings" }
 ];
 
 export function AppShell() {
-  const { theme, toggleTheme } = useThemeStore();
-  const { signOut, authEnabled } = useAuth();
+  const { theme } = useThemeStore();
   const { mode } = useStorageRepository();
+  const { primaryWallet } = useAuth();
+  const { data: accounts = [] } = useAccounts();
+  const { accountId, setAccountId } = useActiveAccountStore();
   const demoMode = import.meta.env.VITE_DEMO_MODE === "1";
+  const navigate = useNavigate();
+  const [showConnectHint, setShowConnectHint] = useState(false);
+
+  useEffect(() => {
+    if (accounts.length === 0) {
+      if (accountId) setAccountId(null);
+      return;
+    }
+    const currentExists = accountId ? accounts.some((acct) => acct.id === accountId) : false;
+    if (accountId && !currentExists) {
+      const match = primaryWallet
+        ? accounts.find((acct) => acct.walletAddress === primaryWallet.address)
+        : null;
+      setAccountId(match?.id ?? null);
+      return;
+    }
+    if (!accountId && primaryWallet) {
+      const match = accounts.find((acct) => acct.walletAddress === primaryWallet.address);
+      if (match) {
+        setAccountId(match.id);
+      }
+    }
+  }, [accountId, primaryWallet, accounts, setAccountId]);
+
+  useEffect(() => {
+    if (primaryWallet) {
+      setShowConnectHint(false);
+      return;
+    }
+    const dismissed = localStorage.getItem("da_connect_hint_dismissed") === "1";
+    setShowConnectHint(!dismissed);
+  }, [primaryWallet]);
 
   return (
     <div className="min-h-screen text-slate-100">
@@ -39,15 +75,36 @@ export function AppShell() {
             )}
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Toggle
-              label="Dark Mode"
-              checked={theme === "dark"}
-              onChange={toggleTheme}
-            />
-            <WalletButton />
+            <WalletStatusPill />
           </div>
         </div>
       </header>
+      {showConnectHint && (
+        <div className="fixed right-6 top-20 z-50 w-72 rounded-lg border border-emerald-400/50 bg-emerald-500/15 p-3 text-xs text-emerald-900 shadow-lg backdrop-blur dark:text-emerald-100">
+          <div className="absolute -top-1 right-6 h-2 w-2 rotate-45 border-l border-t border-emerald-400/50 bg-emerald-500/15" />
+          <p className="font-semibold">Demo data loaded</p>
+          <p className="mt-1 text-emerald-900/80 dark:text-emerald-100/80">
+            You are viewing local mock trades. Connect a wallet to sync real activity.
+          </p>
+          <div className="mt-2 flex items-center gap-2">
+            <button
+              className="rounded-md border border-emerald-400/60 bg-emerald-500/20 px-2 py-1 text-xs font-semibold text-emerald-900 dark:text-emerald-100"
+              onClick={() => navigate("/connect")}
+            >
+              Connect wallet
+            </button>
+            <button
+              className="text-xs text-emerald-900/70 dark:text-emerald-100/70"
+              onClick={() => {
+                localStorage.setItem("da_connect_hint_dismissed", "1");
+                setShowConnectHint(false);
+              }}
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
       <div className="container-app grid gap-6 py-6 lg:grid-cols-[220px_1fr]">
         <aside className="space-y-3">
           <div className="card px-4 py-4">

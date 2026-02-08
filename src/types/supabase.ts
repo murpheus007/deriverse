@@ -1,4 +1,4 @@
-export type Database = {
+﻿export type Database = {
   public: {
     Tables: {
       accounts: {
@@ -38,6 +38,65 @@ export type Database = {
         };
         Relationships: [];
       };
+      wallets: {
+        Row: {
+          id: string;
+          address: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          address: string;
+          created_at?: string;
+        };
+        Update: {
+          address?: string;
+        };
+        Relationships: [];
+      };
+      user_wallets: {
+        Row: {
+          user_id: string;
+          wallet_id: string;
+          label: string | null;
+          is_primary: boolean;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          wallet_id: string;
+          label?: string | null;
+          is_primary?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          label?: string | null;
+          is_primary?: boolean;
+        };
+        Relationships: [];
+      };
+      auth_nonces: {
+        Row: {
+          id: string;
+          user_id: string;
+          wallet_address: string;
+          nonce: string;
+          expires_at: string;
+          used_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          wallet_address: string;
+          nonce: string;
+          expires_at: string;
+          used_at?: string | null;
+        };
+        Update: {
+          used_at?: string | null;
+        };
+        Relationships: [];
+      };
       imports: {
         Row: {
           id: string;
@@ -46,6 +105,7 @@ export type Database = {
           source_label: string | null;
           file_hash: string | null;
           account_id: string | null;
+          wallet_id: string | null;
           status: "pending" | "processed" | "failed";
           created_at: string;
         };
@@ -56,6 +116,7 @@ export type Database = {
           source_label?: string | null;
           file_hash?: string | null;
           account_id?: string | null;
+          wallet_id?: string | null;
           status?: "pending" | "processed" | "failed";
           created_at?: string;
         };
@@ -70,6 +131,7 @@ export type Database = {
           user_id: string;
           import_id: string | null;
           account_id: string | null;
+          wallet_id: string | null;
           ts: string;
           symbol: string;
           market_type: "spot" | "perp" | "options";
@@ -90,6 +152,7 @@ export type Database = {
           user_id: string;
           import_id?: string | null;
           account_id?: string | null;
+          wallet_id?: string | null;
           ts: string;
           symbol: string;
           market_type: "spot" | "perp" | "options";
@@ -116,6 +179,7 @@ export type Database = {
           id: string;
           user_id: string;
           fill_id: string;
+          wallet_id: string | null;
           note: string | null;
           tags: string[];
           created_at: string;
@@ -125,6 +189,7 @@ export type Database = {
           id?: string;
           user_id: string;
           fill_id: string;
+          wallet_id?: string | null;
           note?: string | null;
           tags?: string[];
           created_at?: string;
@@ -142,6 +207,7 @@ export type Database = {
           id: string;
           user_id: string;
           account_id: string | null;
+          wallet_id: string | null;
           trade_ref: string | null;
           title: string;
           strategy_tag: string;
@@ -156,6 +222,7 @@ export type Database = {
           id?: string;
           user_id: string;
           account_id?: string | null;
+          wallet_id?: string | null;
           trade_ref?: string | null;
           title: string;
           strategy_tag: string;
@@ -168,6 +235,7 @@ export type Database = {
         };
         Update: {
           account_id?: string | null;
+          wallet_id?: string | null;
           trade_ref?: string | null;
           title?: string;
           strategy_tag?: string;
@@ -206,3 +274,4 @@ export type Database = {
     CompositeTypes: Record<string, never>;
   };
 };
+

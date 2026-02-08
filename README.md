@@ -21,9 +21,9 @@ Implemented features mapped to the requested scope:
 - Limitation: mock provider uses synthetic fills; no live funding settlement unless included in data.
 
 ## Security
-- Email OTP authentication via Supabase.
+- Supabase anonymous sessions power RLS (`auth.uid()`).
+- Wallet linking requires a signed nonce (no seed phrases or private keys).
 - RLS enforced tables for all user data.
-- Wallet connect is read-only (address only). No private keys or seed phrases are stored.
 
 ## Innovation
 - Pluggable `TradeSyncProvider` architecture for ingestion.
@@ -45,17 +45,24 @@ npm install
 npm run dev
 ```
 
-## Supabase Setup (Auth + Data)
-1. Create a Supabase project and enable Email OTP in Auth settings.
-2. Add your environment values:
+## Supabase Setup (Wallet Auth + Data)
+1. Create a Supabase project.
+2. Apply SQL migrations in `/migrations`.
+3. Add environment values:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
-3. Copy `.env.example` to `.env` and fill in values.
-4. Run the app and sign in at `/login`.
+4. Deploy Edge Functions:
+   - `supabase/functions/create-nonce`
+   - `supabase/functions/verify-wallet-link`
+5. In Supabase Functions env, set:
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+6. Run the app and connect a wallet at `/connect`.
 
 ## Wallet Connect + Sync (Mock Provider)
-- Connect a Solana wallet (read-only address) in Settings.
-- Link the wallet to your profile to enable sync + filtering.
+- Visit `/connect` to link a Solana wallet by signing a nonce.
+- Enable sync for the linked wallet in Settings.
 - Sync inserts are labeled as `source_type = 'mock'` in `imports` for auditability.
 
 ## Scripts
@@ -69,7 +76,7 @@ npm run dev
 
 ## Architecture Notes
 - **Repository provider**: `src/lib/storage` exposes a provider-backed `StorageRepository` interface and swaps between localStorage and Supabase automatically based on env vars.
-- **Auth**: `src/app/authProvider.tsx` handles session state using Supabase email OTP.
+- **Auth**: `src/app/authProvider.tsx` ensures an anonymous Supabase session and links wallets via edge functions.
 - **Analytics engine**: `src/lib/analytics` contains pure functions for metrics and breakdowns. All analytics are deterministic and derived from fills.
 - **CSV import**: `src/lib/csv` handles parsing and validation with Zod and returns detailed error reports.
 - **Mock data**: `src/data/mock.ts` generates realistic fill pairs for quick demos.

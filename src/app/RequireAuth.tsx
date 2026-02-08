@@ -1,8 +1,7 @@
-import { Navigate } from "react-router-dom";
 import { useAuth } from "./authProvider";
 
 export function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading, authEnabled } = useAuth();
+  const { isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -10,10 +9,6 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
         Loading session...
       </div>
     );
-  }
-
-  if (authEnabled && !isAuthenticated) {
-    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;

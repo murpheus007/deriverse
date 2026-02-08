@@ -1,4 +1,4 @@
-import type { Account } from "../../types/db";
+﻿import type { Account } from "../../types/db";
 import type { StorageRepository } from "../storage/repositories";
 import type { TradeSyncProvider } from "./provider";
 import { MockSyncProvider } from "./provider";
@@ -7,7 +7,8 @@ import type { Cursor } from "./types";
 export async function runAccountSync(
   account: Account,
   provider: TradeSyncProvider,
-  repo: StorageRepository
+  repo: StorageRepository,
+  walletId?: string | null
 ): Promise<{ inserted: number; skipped: number; nextCursor: Cursor }> {
   await repo.updateAccountSyncState(account.id, { sync_status: "syncing", sync_error: null });
   let importRow: { id: string } | null = null;
@@ -17,7 +18,8 @@ export async function runAccountSync(
       ? await repo.createImport({
           source_type: "mock",
           source_label: "Mock Sync",
-          account_id: account.id
+          account_id: account.id,
+          wallet_id: walletId ?? null
         })
       : null;
     const { fills, nextCursor } = await provider.fetchNewFills(account.walletAddress, {
@@ -42,6 +44,7 @@ export async function runAccountSync(
         raw: fill.raw,
         tags: fill.tags,
         accountId: account.id,
+        walletId: walletId ?? null,
         importId: importRow?.id ?? null
       }))
     );
@@ -74,3 +77,4 @@ export async function runAccountSync(
     throw error;
   }
 }
+

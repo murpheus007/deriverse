@@ -1,4 +1,4 @@
-import type { StorageRepository } from "./repositories";
+﻿import type { StorageRepository } from "./repositories";
 import type { TypedSupabaseClient } from "../supabase/client";
 import type { Account, ImportRow } from "../../types/db";
 import type { FillAnnotation, FillFilters, TradeFill, TradeFillInsert } from "../../types/trades";
@@ -33,7 +33,8 @@ function mapFillRow(row: Database["public"]["Tables"]["fills"]["Row"]): TradeFil
     raw: row.raw,
     tags: row.tags ?? [],
     importId: row.import_id,
-    accountId: row.account_id
+    accountId: row.account_id,
+    walletId: row.wallet_id
   };
 }
 
@@ -61,6 +62,7 @@ function mapImportRow(row: Database["public"]["Tables"]["imports"]["Row"]): Impo
     sourceLabel: row.source_label,
     fileHash: row.file_hash,
     accountId: row.account_id,
+    walletId: row.wallet_id,
     status: row.status,
     createdAt: row.created_at
   };
@@ -88,6 +90,7 @@ function mapJournalRow(
     createdAt: row.created_at,
     tradeRef: row.trade_ref ?? undefined,
     accountId: row.account_id ?? null,
+    walletId: row.wallet_id ?? null,
     title: row.title,
     strategyTag: row.strategy_tag,
     mood: row.mood,
@@ -157,6 +160,7 @@ export function createSupabaseRepository(
       if (filters.marketType) query = query.eq("market_type", filters.marketType);
       if (filters.side) query = query.eq("side", filters.side);
       if (filters.accountId) query = query.eq("account_id", filters.accountId);
+      if (filters.walletId) query = query.eq("wallet_id", filters.walletId);
       if (filters.orderType) query = query.eq("order_type", filters.orderType);
 
       const { data, error } = await query;
@@ -174,6 +178,7 @@ export function createSupabaseRepository(
           user_id: userId,
           import_id: importId,
           account_id: fill.accountId ?? null,
+          wallet_id: fill.walletId ?? null,
           ts: fill.ts,
           symbol: fill.symbol,
           market_type: fill.marketType,
@@ -208,6 +213,7 @@ export function createSupabaseRepository(
           user_id: userId,
           import_id: fill.importId ?? null,
           account_id: accountId,
+          wallet_id: fill.walletId ?? null,
           ts: fill.ts,
           symbol: fill.symbol,
           market_type: fill.marketType,
@@ -301,6 +307,7 @@ export function createSupabaseRepository(
         id: input.id,
         user_id: userId,
         account_id: input.accountId ?? null,
+        wallet_id: input.walletId ?? null,
         trade_ref: input.tradeRef ?? null,
         title: input.title,
         strategy_tag: input.strategyTag,
@@ -362,6 +369,7 @@ export function createSupabaseRepository(
           source_label: meta.source_label ?? null,
           file_hash: meta.file_hash ?? null,
           account_id: meta.account_id ?? null,
+          wallet_id: meta.wallet_id ?? null,
           status: "pending"
         })
         .select("*")
@@ -389,3 +397,4 @@ export function createSupabaseRepository(
     }
   };
 }
+

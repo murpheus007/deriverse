@@ -25,7 +25,7 @@ export function SymbolTable({ rows }: { rows: { symbol: string; pnl: number; win
             {rows.map((row) => (
               <tr key={row.symbol} className="border-t border-slate-800/60">
                 <td>{row.symbol}</td>
-                <td className={row.pnl >= 0 ? "text-emerald-400" : "text-rose-400"}>
+                <td className={row.pnl >= 0 ? "text-profit" : "text-loss"}>
                   {formatCurrency(row.pnl)}
                 </td>
                 <td>{formatPct(row.winRate)}</td>

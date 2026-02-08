@@ -1,4 +1,4 @@
-export type Account = {
+﻿export type Account = {
   id: string;
   userId: string;
   chain: "solana";
@@ -12,6 +12,27 @@ export type Account = {
   updatedAt?: string;
 };
 
+export type Wallet = {
+  id: string;
+  address: string;
+  createdAt: string;
+};
+
+export type UserWallet = {
+  userId: string;
+  walletId: string;
+  label?: string | null;
+  isPrimary: boolean;
+  createdAt: string;
+};
+
+export type LinkedWallet = {
+  walletId: string;
+  address: string;
+  label?: string | null;
+  isPrimary: boolean;
+};
+
 export type ImportRow = {
   id: string;
   userId: string;
@@ -19,6 +40,8 @@ export type ImportRow = {
   sourceLabel?: string | null;
   fileHash?: string | null;
   accountId?: string | null;
+  walletId?: string | null;
   status: "pending" | "processed" | "failed";
   createdAt: string;
 };
+

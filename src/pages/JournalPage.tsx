@@ -5,26 +5,44 @@ import { JournalList } from "../components/journal/JournalList";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import type { JournalEntry, JournalEntryUpsert } from "../types/journal";
+import { useAuth } from "../app/authProvider";
+import { useActiveAccountStore } from "../lib/storage/activeAccount";
 
 export function JournalPage() {
-  const { data: fills = [] } = useFills({ limit: 10000 });
+  const { accountId } = useActiveAccountStore();
+  const { data: fills = [] } = useFills({ accountId, limit: 10000 });
   const { data: entries = [] } = useJournalEntries();
   const saveJournal = useUpsertJournalEntry();
+  const { primaryWallet } = useAuth();
   const [editing, setEditing] = useState<JournalEntry | null>(null);
   const [search, setSearch] = useState("");
 
+  const scopedEntries = useMemo(() => {
+    const walletId = primaryWallet?.walletId ?? null;
+    if (accountId) {
+      return entries.filter((entry) => {
+        if (entry.accountId) return entry.accountId === accountId;
+        return walletId ? entry.walletId === walletId : true;
+      });
+    }
+    if (walletId) {
+      return entries.filter((entry) => entry.walletId === walletId || entry.walletId == null);
+    }
+    return entries;
+  }, [entries, accountId, primaryWallet]);
+
   const filteredEntries = useMemo(() => {
-    if (!search) return entries;
+    if (!search) return scopedEntries;
     const term = search.toLowerCase();
-    return entries.filter((entry) =>
+    return scopedEntries.filter((entry) =>
       `${entry.title} ${entry.strategyTag} ${entry.mood} ${entry.customTags.join(" ")}`
         .toLowerCase()
         .includes(term)
     );
-  }, [entries, search]);
+  }, [scopedEntries, search]);
 
   const handleSave = (entry: JournalEntryUpsert) => {
-    saveJournal.mutate(entry);
+    saveJournal.mutate({ ...entry, walletId: primaryWallet?.walletId ?? null });
     setEditing(null);
   };
 

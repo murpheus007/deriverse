@@ -104,6 +104,36 @@ body {
   color: var(--text);
 }
 
+.badge-neutral {
+  background: transparent;
+}
+
+.badge-info {
+  border-color: rgba(14, 116, 144, 0.45);
+  background: rgba(14, 116, 144, 0.12);
+  color: #0f766e;
+}
+
+.badge-positive {
+  border-color: rgba(16, 185, 129, 0.55);
+  background: rgba(16, 185, 129, 0.12);
+  color: #15803d;
+}
+
+.badge-negative {
+  border-color: rgba(239, 68, 68, 0.55);
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+
+.text-profit {
+  color: #15803d;
+}
+
+.text-loss {
+  color: #b91c1c;
+}
+
 .btn {
   @apply inline-flex items-center justify-center gap-2 rounded-md px-3.5 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 disabled:opacity-50 disabled:cursor-not-allowed;
   border: 1px solid var(--border);
@@ -150,6 +180,29 @@ body {
   border-color: rgba(45, 212, 191, 0.4);
 }
 
+.dark .badge-info {
+  color: #5eead4;
+  background: rgba(45, 212, 191, 0.18);
+}
+
+.dark .badge-positive {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.dark .badge-negative {
+  color: #fb7185;
+  background: rgba(244, 63, 94, 0.2);
+}
+
+.dark .text-profit {
+  color: #34d399;
+}
+
+.dark .text-loss {
+  color: #fb7185;
+}
+
 .table-base {
   @apply w-full text-left text-sm;
 }
@@ -162,6 +215,11 @@ body {
 .table-base td {
   @apply px-3 py-2;
   color: var(--text);
+}
+
+.table-scroll {
+  @apply w-full min-w-0 overflow-x-auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .section-title {

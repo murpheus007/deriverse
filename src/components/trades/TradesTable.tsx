@@ -85,12 +85,26 @@ export function TradesTable({
       {
         accessorKey: "pnl",
         header: "PnL",
-        cell: (info) => formatCurrency(Number(info.getValue()))
+        cell: (info) => {
+          const value = Number(info.getValue());
+          return (
+            <span className={value >= 0 ? "text-profit" : "text-loss"}>
+              {formatCurrency(value)}
+            </span>
+          );
+        }
       },
       {
         accessorKey: "returnPct",
         header: "Return",
-        cell: (info) => formatPct(Number(info.getValue()))
+        cell: (info) => {
+          const value = Number(info.getValue());
+          return (
+            <span className={value >= 0 ? "text-profit" : "text-loss"}>
+              {formatPct(value)}
+            </span>
+          );
+        }
       },
       {
         accessorKey: "totalFees",
@@ -121,7 +135,7 @@ export function TradesTable({
 
   return (
     <div className="table-scroll">
-      <table className="table-base min-w-[860px]">
+      <table className="table-base min-w-[860px] whitespace-nowrap">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>

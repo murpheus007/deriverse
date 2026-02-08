@@ -1,0 +1,5 @@
+[functions.create-nonce]
+verify_jwt = false
+
+[functions.verify-wallet-link]
+verify_jwt = false

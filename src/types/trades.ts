@@ -1,4 +1,4 @@
-export type MarketType = "spot" | "perp" | "options";
+﻿export type MarketType = "spot" | "perp" | "options";
 export type TradeSide = "long" | "short";
 export type FeeType = "maker" | "taker" | "funding" | "other";
 export type OrderType = "market" | "limit" | "stop" | "other";
@@ -20,6 +20,7 @@ export type TradeFill = {
   tags: string[];
   importId?: string | null;
   accountId?: string | null;
+  walletId?: string | null;
 };
 
 export type DerivedTrade = {
@@ -46,6 +47,7 @@ export type FillFilters = {
   marketType?: MarketType;
   side?: TradeSide;
   accountId?: string | null;
+  walletId?: string | null;
   orderType?: OrderType;
   limit?: number;
   offset?: number;
@@ -67,6 +69,7 @@ export type TradeFillInsert = {
   tags: string[];
   importId?: string | null;
   accountId?: string | null;
+  walletId?: string | null;
 };
 
 export type FillAnnotation = {
@@ -78,3 +81,4 @@ export type FillAnnotation = {
   createdAt: string;
   updatedAt?: string | null;
 };
+

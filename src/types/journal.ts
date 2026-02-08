@@ -1,8 +1,9 @@
-export type JournalEntry = {
+﻿export type JournalEntry = {
   id: string;
   createdAt: string;
   tradeRef?: string;
   accountId?: string | null;
+  walletId?: string | null;
   title: string;
   strategyTag: string;
   mood: string;
@@ -16,6 +17,7 @@ export type JournalEntryUpsert = {
   id?: string;
   tradeRef?: string;
   accountId?: string | null;
+  walletId?: string | null;
   title: string;
   strategyTag: string;
   mood: string;
@@ -24,3 +26,4 @@ export type JournalEntryUpsert = {
   screenshotUrls: string[];
   customTags: string[];
 };
+

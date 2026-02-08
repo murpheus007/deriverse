@@ -1,4 +1,4 @@
-import type { FilterState } from "../../types/filters";
+﻿import type { FilterState } from "../../types/filters";
 import type { FillFilters, TradeFill } from "../../types/trades";
 
 export function mapUiFiltersToFillFilters(filters: FilterState, accountId?: string | null): FillFilters {
@@ -22,7 +22,9 @@ export function applyFillFiltersLocal(fills: TradeFill[], filters: FillFilters):
     const marketOk = filters.marketType ? fill.marketType === filters.marketType : true;
     const sideOk = filters.side ? fill.side === filters.side : true;
     const accountOk = filters.accountId ? fill.accountId === filters.accountId : true;
+    const walletOk = filters.walletId ? fill.walletId === filters.walletId : true;
     const orderOk = filters.orderType ? fill.orderType === filters.orderType : true;
-    return fromOk && toOk && symbolOk && marketOk && sideOk && accountOk && orderOk;
+    return fromOk && toOk && symbolOk && marketOk && sideOk && accountOk && walletOk && orderOk;
   });
 }
+

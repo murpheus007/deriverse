@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+﻿import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useStorageRepository } from "./repositories";
 import { useAuth } from "../../app/authProvider";
 import type { FillFilters, TradeFillInsert } from "../../types/trades";
@@ -59,6 +59,7 @@ export function useImportCsv() {
         source_label?: string;
         file_hash?: string;
         account_id?: string | null;
+        wallet_id?: string | null;
       };
     }) => {
       const importRow = await repository.createImport(meta);
@@ -130,3 +131,4 @@ export function useDeleteJournalEntry() {
     onSuccess: () => client.invalidateQueries({ queryKey: queryKeys.journal(userId) })
   });
 }
+
