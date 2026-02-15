@@ -130,58 +130,17 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div>
-            <p className="section-title">Connected wallet</p>
-            <p className="text-xs text-slate-400">Wallet-based authentication and sync.</p>
-          </div>
-          <span className="badge text-[11px] uppercase tracking-wide">Demo Mode: mock sync</span>
-        </CardHeader>
-        <CardBody className="space-y-4">
-          <div className="rounded-xl border border-amber-500/40 bg-amber-500/15 px-4 py-3 text-xs text-amber-900 dark:text-amber-100">
-            Demo Mode: Sync uses mock fills (idempotent). Live Deriverse sync is pluggable and planned.
-          </div>
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="text-sm text-slate-300">
-              {walletAddress ? (
-                <div>
-                  <p className="font-semibold text-slate-100">{shortAddress(walletAddress)}</p>
-                  <p className="text-xs text-slate-400">Primary wallet</p>
-                </div>
-              ) : (
-                <p>No wallet linked yet.</p>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="secondary" disabled>
-                Link another wallet (soon)
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={async () => {
-                  await disconnect();
-                  await signOut();
-                  navigate("/connect");
-                }}
-              >
-                Disconnect
-              </Button>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
 
       <Card>
         <CardHeader>
-          <div>
+          <div className="min-w-0">
             <p className="section-title">Wallets & Sync</p>
             <p className="text-xs text-slate-400">Link wallets for sync and filtering.</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-4">
           {walletAddress && (
-            <div className="flex flex-1 flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div className="flex min-w-0 flex-1 flex-col gap-2 md:flex-row md:items-center md:justify-between">
               {!linkedAccount?.label && (
                 <div className="w-full md:max-w-xs">
                   <p className="label">Label (optional)</p>
@@ -190,6 +149,7 @@ export function SettingsPage() {
               )}
               <Button
                 variant="secondary"
+                className="w-full md:w-auto"
                 onClick={() =>
                   addAccount.mutate(
                     { chain: "solana", wallet_address: walletAddress, label: accountLabel || undefined },
@@ -230,6 +190,7 @@ export function SettingsPage() {
                   </div>
                   <Button
                     variant="secondary"
+                    className="w-full md:w-auto"
                     onClick={async () => {
                       setSyncingAccountId(account.id);
                       try {
@@ -274,15 +235,15 @@ export function SettingsPage() {
 
       <Card>
         <CardHeader>
-          <div>
+          <div className="min-w-0">
             <p className="section-title">Data Management</p>
             <p className="text-xs text-slate-400">Import, export, and seed data</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-4">
-          <div className="flex flex-wrap gap-3">
-            <Button onClick={handleSeed}>Seed Mock Fills</Button>
-            <Button variant="secondary" onClick={handleExport}>Export JSON</Button>
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Button onClick={handleSeed} className="w-full sm:w-auto">Seed Mock Fills</Button>
+            <Button variant="secondary" onClick={handleExport} className="w-full sm:w-auto">Export JSON</Button>
           </div>
           <div
             className={`rounded-xl border border-dashed p-5 transition ${
@@ -301,13 +262,23 @@ export function SettingsPage() {
             }}
           >
             <p className="text-sm text-slate-300">CSV Import</p>
-            <p className="text-xs text-slate-500">Expected headers: {template.split("\n")[0]}</p>
-            <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-center">
+            <p className="text-xs text-slate-500">Expected headers:</p>
+            <p
+              className="mt-1 break-all rounded-md border px-2 py-1 font-mono text-[11px] leading-relaxed"
+              style={{
+                background: "var(--surface-muted)",
+                color: "var(--text)",
+                borderColor: "var(--border)"
+              }}
+            >
+              {template.split("\n")[0]}
+            </p>
+            <div className="mt-3 flex min-w-0 flex-col gap-3 md:flex-row md:items-center">
               <Input type="file" accept=".csv" onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (file) handleCsv(file);
               }} />
-              {fileName && <p className="text-xs text-slate-400">Loaded: {fileName}</p>}
+              {fileName && <p className="break-all text-xs text-slate-400">Loaded: {fileName}</p>}
             </div>
           </div>
           {csvErrors.length > 0 && (

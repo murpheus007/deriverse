@@ -49,6 +49,7 @@ export function AppShell() {
 
   useEffect(() => {
     if (primaryWallet) {
+      localStorage.setItem("da_connect_hint_dismissed", "1");
       setShowConnectHint(false);
       return;
     }
@@ -80,8 +81,8 @@ export function AppShell() {
         </div>
       </header>
       {showConnectHint && (
-        <div className="fixed right-6 top-20 z-50 w-72 rounded-lg border border-emerald-400/50 bg-emerald-500/15 p-3 text-xs text-emerald-900 shadow-lg backdrop-blur dark:text-emerald-100">
-          <div className="absolute -top-1 right-6 h-2 w-2 rotate-45 border-l border-t border-emerald-400/50 bg-emerald-500/15" />
+        <div className="fixed left-3 right-3 top-20 z-50 rounded-lg border border-emerald-400/50 bg-emerald-500/15 p-3 text-xs text-emerald-900 shadow-lg backdrop-blur dark:text-emerald-100 sm:left-auto sm:right-6 sm:w-72">
+          <div className="absolute -top-1 right-6 h-2 w-2 rotate-45 border-l border-t border-emerald-400/50 bg-emerald-500/15 sm:block" />
           <p className="font-semibold">Demo data loaded</p>
           <p className="mt-1 text-emerald-900/80 dark:text-emerald-100/80">
             You are viewing local mock trades. Connect a wallet to sync real activity.
