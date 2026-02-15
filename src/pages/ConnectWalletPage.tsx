@@ -97,7 +97,17 @@ export function ConnectWalletPage() {
               )}
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button onClick={handleConnect}>Connect wallet</Button>
+              <Button onClick={handleConnect} className="px-5 py-2.5">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M4 7h16v10H4z" />
+                  <path d="M7 10h.01" />
+                  <path d="M16 10h.01" />
+                  <path d="M2 7h2" />
+                  <path d="M20 7h2" />
+                  <path d="M6 17h12" />
+                </svg>
+                Connect wallet
+              </Button>
               <Button variant="secondary" onClick={handleSign} disabled={!walletAddress || isSigning}>
                 {isSigning ? "Signing..." : "Sign message to continue"}
               </Button>
