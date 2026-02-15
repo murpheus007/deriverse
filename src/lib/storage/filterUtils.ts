@@ -1,4 +1,4 @@
-﻿import type { FilterState } from "../../types/filters";
+import type { FilterState } from "../../types/filters";
 import type { FillFilters, TradeFill } from "../../types/trades";
 
 export function mapUiFiltersToFillFilters(filters: FilterState, accountId?: string | null): FillFilters {

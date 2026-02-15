@@ -83,7 +83,7 @@ export function StorageProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const seed = generateMockFills(50).map((fill) => ({
+    const seed = generateMockFills(100).map((fill) => ({
       ts: fill.ts,
       symbol: fill.symbol,
       marketType: fill.marketType,

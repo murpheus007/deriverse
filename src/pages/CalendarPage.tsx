@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFills } from "../lib/storage/hooks";
 import { useActiveAccountStore } from "../lib/storage/activeAccount";
 import { deriveTradesFromFills } from "../lib/analytics";
@@ -170,7 +170,7 @@ export function CalendarPage() {
                 <div>
                   <p className="font-semibold text-slate-100">{trade.symbol}</p>
                   <p className="text-xs text-slate-400">
-                    {trade.side.toUpperCase()} · {trade.qty} @ {trade.entryPrice.toFixed(2)}
+                    {trade.side.toUpperCase()} - {trade.qty} @ {trade.entryPrice.toFixed(2)}
                   </p>
                 </div>
                 <div className={trade.pnl >= 0 ? "text-emerald-300" : "text-rose-300"}>

@@ -147,8 +147,8 @@ export function TradesTable({
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
                     {{
-                      asc: "?",
-                      desc: "?"
+                      asc: "^",
+                      desc: "v"
                     }[header.column.getIsSorted() as string] ?? null}
                   </button>
                 </th>

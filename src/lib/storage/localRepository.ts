@@ -1,4 +1,4 @@
-﻿import type { StorageRepository } from "./repositories";
+import type { StorageRepository } from "./repositories";
 import { readStorage, writeStorage } from "./localStorage";
 import type { Account, ImportRow } from "../../types/db";
 import type { FillAnnotation, FillFilters, TradeFill, TradeFillInsert } from "../../types/trades";

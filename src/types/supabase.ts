@@ -1,4 +1,4 @@
-﻿export type Database = {
+export type Database = {
   public: {
     Tables: {
       accounts: {

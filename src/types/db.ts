@@ -1,4 +1,4 @@
-﻿export type Account = {
+export type Account = {
   id: string;
   userId: string;
   chain: "solana";

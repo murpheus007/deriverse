@@ -1,4 +1,4 @@
-﻿import type { Account } from "../../types/db";
+import type { Account } from "../../types/db";
 import type { StorageRepository } from "../storage/repositories";
 import type { TradeSyncProvider } from "./provider";
 import { MockSyncProvider } from "./provider";

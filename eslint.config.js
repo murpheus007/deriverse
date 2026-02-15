@@ -1,19 +1,28 @@
 import js from "@eslint/js";
+import globals from "globals";
+import tsParser from "@typescript-eslint/parser";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
 import react from "eslint-plugin-react";
 import hooks from "eslint-plugin-react-hooks";
 import a11y from "eslint-plugin-jsx-a11y";
 
 export default [
-  js.configs.recommended,
+  {
+    ignores: ["dist", "node_modules", "supabase/.temp"]
+  },
+  {
+    ...js.configs.recommended,
+    files: ["**/*.{js,mjs,cjs}"]
+  },
   {
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
-      ecmaVersion: 2020,
+      parser: tsParser,
+      ecmaVersion: "latest",
       sourceType: "module",
       globals: {
-        window: "readonly",
-        document: "readonly",
-        console: "readonly"
+        ...globals.browser,
+        ...globals.node
       },
       parserOptions: {
         ecmaFeatures: { jsx: true }
@@ -21,20 +30,22 @@ export default [
     },
     settings: { react: { version: "detect" } },
     plugins: {
+      "@typescript-eslint": tsPlugin,
       react,
       "react-hooks": hooks,
       "jsx-a11y": a11y
     },
     rules: {
+      ...tsPlugin.configs.recommended.rules,
+      "no-undef": "off",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
-      "react/jsx-no-leaked-render": "warn",
+      "react/jsx-no-leaked-render": "off",
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
       "jsx-a11y/anchor-is-valid": "off"
     }
-  },
-  {
-    ignores: ["dist", "node_modules"]
   }
 ];

@@ -66,7 +66,7 @@ export function TradeDetailsDrawer({
               </div>
               <div>
                 <p className="text-slate-400">Entry / Exit</p>
-                <p>{trade.entryPrice.toFixed(2)} → {trade.exitPrice.toFixed(2)}</p>
+                <p>{trade.entryPrice.toFixed(2)} -&gt; {trade.exitPrice.toFixed(2)}</p>
               </div>
               <div>
                 <p className="text-slate-400">PnL</p>

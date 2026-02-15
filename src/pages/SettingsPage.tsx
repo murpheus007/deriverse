@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { Card, CardBody, CardHeader } from "../components/ui/Card";
@@ -45,6 +45,17 @@ export function SettingsPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [syncingAccountId, setSyncingAccountId] = useState<string | null>(null);
+
+  const handleLogout = async () => {
+    try {
+      await disconnect();
+    } catch {
+      // Wallet disconnect is best-effort; continue clearing the app session.
+    }
+    await signOut();
+    setAccountId(null);
+    navigate("/connect");
+  };
 
   const handleSeed = () => {
     const seeded = generateMockFills(40);
@@ -107,6 +118,7 @@ export function SettingsPage() {
 
   const template = useMemo(() => buildCsvTemplate(), []);
   const walletAddress = primaryWallet?.address ?? null;
+  const hasLinkedPrimaryWallet = Boolean(primaryWallet?.address);
   const linkedAddresses = useMemo(() => new Set(accounts.map((acct) => acct.walletAddress)), [accounts]);
   const linkedAccount = accounts.find((acct) => acct.walletAddress === walletAddress) ?? null;
   const activeAccount = accounts.find((acct) => acct.id === accountId);
@@ -321,6 +333,21 @@ export function SettingsPage() {
             <div>
               <p className="label">Fills stored</p>
               <p className="text-sm text-slate-300">{fills.length} fills stored</p>
+            </div>
+            <div className="min-w-0">
+              <p className="label">Session</p>
+              <p className="break-all text-sm text-slate-300">
+                {primaryWallet?.address ?? "No wallet linked"}
+              </p>
+            </div>
+            <div className="flex items-end">
+              <Button
+                variant="secondary"
+                className="w-full md:w-auto"
+                onClick={hasLinkedPrimaryWallet ? handleLogout : () => navigate("/connect")}
+              >
+                {hasLinkedPrimaryWallet ? "Disconnect Wallet" : "Connect Wallet"}
+              </Button>
             </div>
           </div>
         </CardBody>

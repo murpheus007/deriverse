@@ -1,116 +1,177 @@
 # Deriverse Analytics
 
-A production-quality trading analytics and journal dashboard for the Deriverse Solana ecosystem. This build prioritizes correctness, auditability, and a pluggable ingestion pipeline while keeping the UI fast and deterministic.
+Wallet-aware trading analytics dashboard for Solana.  
+The app supports two runtime modes:
 
-**New flow:** the app opens in **Demo Mode** (local mock data) for first-time visitors. Wallet connection is encouraged but not required to explore the UI.
+- **Demo mode (default first run):** seeds local mock fills and runs fully from localStorage.
+- **Wallet-linked mode:** uses Supabase anon auth + wallet signature verification + RLS-scoped data.
 
-## Bounty Alignment
-Implemented features mapped to the requested scope:
-- PnL tracking + charts + drawdown overlay
-- Volume + fees + fee composition breakdown
-- Win rate, trade count, avg win/loss, largest win/loss
-- Long/short ratio and directional bias
-- Average trade duration (derived round-trips)
-- Time-based performance (daily + hourly)
-- Trade history table + annotations
-- Order type performance
-- Filters: symbol, date range, market type, side, account
+## What Is In This Repo
 
-## Accuracy & Methodology
-- Idempotent ingestion enforced by unique key: `(account_id, tx_sig, event_id)`.
-- Deterministic money math via utility helpers to avoid floating drift.
-- Realized PnL is computed from derived round-trip trades grouped from fills.
-- Limitation: mock provider uses synthetic fills; no live funding settlement unless included in data.
+- React 19 + Vite + TypeScript
+- Tailwind-based component styling
+- TanStack Query + TanStack Table
+- Supabase repositories + Edge Functions for wallet link flow
+- SQL migrations for wallet auth/linking and mock import source support
 
-## Security
-- Supabase anonymous sessions power RLS (`auth.uid()`).
-- Wallet linking requires a signed nonce (no seed phrases or private keys).
-- RLS enforced tables for all user data.
+## Current Route Map
 
-## Innovation
-- Pluggable `TradeSyncProvider` architecture for ingestion.
-- Mock provider demonstrates the full pipeline and DB persistence.
-- Cursor fields (`last_synced_at`, `last_synced_sig`) support incremental sync without UI changes.
+- Public: `/connect`
+- App shell: `/`, `/trades`, `/journal`, `/portfolio`, `/calendar`, `/settings`
 
-## Architecture
+## Project Structure
+
+```text
+src/
+  app/                    # providers, auth context, router, shell
+  components/             # UI + feature components
+  pages/                  # route pages
+  lib/
+    analytics/            # pure analytics and derived-trade logic
+    storage/              # local + supabase repositories
+    sync/                 # mock sync provider pipeline
+    supabase/             # typed supabase client
+supabase/
+  config.toml             # edge function config (verify_jwt flags)
+  functions/
+    create-nonce/
+    verify-wallet-link/
+migrations/
+  2026_02_07_imports_mock_source.sql
+  2026_02_08_wallet_auth.sql
 ```
-UI
- +- Query/State (TanStack Query + Zustand)
-     +- Repository (Supabase | Local)
-         +- Analytics (pure functions)
-         +- Ingestion (CSV | Mock Sync)
+
+## Prerequisites
+
+- Node.js 20+
+- npm 10+
+- (Optional) Supabase CLI 2.75+
+- Phantom wallet extension/app for wallet-link flow
+
+## Local Setup (Demo Mode Only)
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Create env file:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Start dev server:
+
+   ```bash
+   npm run dev
+   ```
+
+If `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` are empty, the app runs local-only.
+
+## Supabase Setup (Wallet Link + RLS Data)
+
+### 1) Create project and enable anonymous auth
+
+- Supabase Dashboard -> **Authentication** -> **Providers** -> enable **Anonymous Sign-Ins**.
+
+### 2) Apply migrations
+
+Run these SQL files in order (SQL editor or migration tool):
+
+1. `migrations/2026_02_07_imports_mock_source.sql`
+2. `migrations/2026_02_08_wallet_auth.sql`
+
+`2026_02_08_wallet_auth.sql` assumes base tables already exist:
+
+- `accounts`
+- `fills`
+- `imports`
+- `journal_entries`
+- `fill_annotations`
+
+If those tables are not present yet, apply your base schema first.
+
+### 3) Configure frontend env
+
+Set these in `.env` (from `.env.example`):
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_SOLANA_RPC_URL` (optional override; defaults to Solana devnet)
+- `VITE_DEMO_MODE` (`1` keeps demo seeding behavior when not linked)
+
+### 4) Configure Edge Functions
+
+`supabase/config.toml` already contains:
+
+```toml
+[functions.create-nonce]
+verify_jwt = false
+
+[functions.verify-wallet-link]
+verify_jwt = false
 ```
 
-## Getting Started
+Create a local function env file if needed:
+
 ```bash
-npm install
-npm run dev
+cp supabase/.env.example supabase/.env
 ```
 
-## Demo Mode (Local)
-- First visit with no linked wallet seeds **100 mock fills** into localStorage.
-- You can explore all analytics, charts, and journal UI without connecting.
-- A tooltip guide in the header invites you to connect a wallet when ready.
+`verify-wallet-link` expects `SERVICE_ROLE_KEY` in function secrets.
 
-## Supabase Setup (Wallet Auth + Data)
-1. Create a Supabase project.
-2. Apply SQL migrations in `/migrations`.
-3. Add environment values:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-4. Deploy Edge Functions:
-   - `supabase/functions/create-nonce`
-   - `supabase/functions/verify-wallet-link`
-5. In Supabase Functions env, set:
-   - `SUPABASE_URL`
-   - `SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-6. Run the app and connect a wallet at `/connect`.
+Set secrets in your Supabase project:
 
-## Wallet Connect + Sync (Mock Provider)
-- Visit `/connect` to link a Solana wallet by signing a nonce.
-- Enable sync for the linked wallet in Settings.
-- Sync inserts are labeled as `source_type = 'mock'` in `imports` for auditability.
+```bash
+supabase secrets set SERVICE_ROLE_KEY=your_service_role_key --project-ref <project_ref>
+```
+
+### 5) Deploy Edge Functions
+
+```bash
+supabase functions deploy create-nonce --project-ref <project_ref>
+supabase functions deploy verify-wallet-link --project-ref <project_ref>
+```
+
+### 6) Validate flow
+
+1. Open app and click **Connect Wallet**.
+2. Connect Phantom.
+3. Sign nonce message.
+4. Confirm linked wallet appears in Settings and app data loads/scopes correctly.
+
+## Quality Commands
+
+```bash
+npm run lint
+npm run test:run
+npm run build
+```
+
+## Notes For New Developers
+
+- Storage mode is selected automatically in `src/lib/storage/repositories.tsx`.
+- Demo seed inserts **100 mock fills** once per browser profile (`da_demo_seeded`).
+- Wallet linking logic lives in:
+  - client: `src/app/authProvider.tsx`
+  - server: `supabase/functions/create-nonce/index.ts`
+  - server: `supabase/functions/verify-wallet-link/index.ts`
+- Theme toggle and wallet/session controls are in `src/pages/SettingsPage.tsx`.
 
 ## Troubleshooting
-- **Invalid JWT from Edge Functions**: ensure the client is using the correct `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, then redeploy functions. Verify `supabase/config.toml` has function config blocks (CLI 2.75+):
-  ```
-  [functions.create-nonce]
-  verify_jwt = false
 
-  [functions.verify-wallet-link]
-  verify_jwt = false
-  ```
-- **401/Unauthorized from functions**: confirm function secrets are set in Supabase Functions env (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) and redeploy.
-- **Wallet signature button disabled**: ensure the wallet is connected in the browser extension and the address matches the wallet you intend to link.
-- **No data showing**: if in Demo Mode, clear `da_demo_seeded` + `da_fills` in localStorage and refresh to reseed.
+- **`401 Invalid JWT` on `create-nonce`:**
+  - enable Anonymous Sign-Ins in Supabase Auth,
+  - verify frontend URL/anon key values,
+  - redeploy functions after config changes.
 
-## UI Notes
-- **Trades**: on mobile, trades render as compact cards; full table remains on desktop.
-- **Portfolio**: mobile card layout for allocations; full table on desktop.
-- **Performance cues**: PnL and allocation values are color-coded (profit vs loss).
+- **Function deploy fails with config parse errors:**
+  - keep function config only in `supabase/config.toml`,
+  - use `[functions.<name>] verify_jwt = false` blocks (not legacy nested formats).
 
-## Scripts
-- `npm run dev` - start dev server
-- `npm run build` - build production bundle
-- `npm run preview` - preview production build
-- `npm run lint` - lint code
-- `npm run format` - format code
-- `npm run test` - run vitest in watch mode
-- `npm run test:run` - run tests once
-
-## Architecture Notes
-- **Repository provider**: `src/lib/storage` exposes a provider-backed `StorageRepository` interface and swaps between localStorage and Supabase automatically based on env vars.
-- **Auth**: `src/app/authProvider.tsx` ensures an anonymous Supabase session and links wallets via edge functions.
-- **Analytics engine**: `src/lib/analytics` contains pure functions for metrics and breakdowns. All analytics are deterministic and derived from fills.
-- **CSV import**: `src/lib/csv` handles parsing and validation with Zod and returns detailed error reports.
-- **Mock data**: `src/data/mock.ts` generates realistic fill pairs for quick demos.
-- **Design system**: `src/components/ui` includes reusable cards, inputs, buttons, badges, and drawers.
-
-## Local Persistence (fallback)
-- When Supabase env vars are missing **or** no wallet is linked, the app uses localStorage (`da_fills`, `da_journal`, `da_annotations`).
-
-## Future Work (Not in Scope)
-- Replace mock sync with a real Deriverse event decoder or indexer pipeline.
-- Add pagination for large fills datasets.
-- Materialize derived trades server-side for analytics at scale.
+- **Wallet signs but link fails:**
+  - ensure `SERVICE_ROLE_KEY` secret is set,
+  - confirm wallet address in request matches signing wallet,
+  - check Edge Function logs in Supabase dashboard.

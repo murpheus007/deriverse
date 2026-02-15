@@ -1,4 +1,4 @@
-﻿export type MarketType = "spot" | "perp" | "options";
+export type MarketType = "spot" | "perp" | "options";
 export type TradeSide = "long" | "short";
 export type FeeType = "maker" | "taker" | "funding" | "other";
 export type OrderType = "market" | "limit" | "stop" | "other";

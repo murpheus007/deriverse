@@ -121,7 +121,7 @@ export function TradesPage() {
                     <div>
                       <p className="text-sm font-semibold text-slate-100">{fill.symbol}</p>
                       <p className="text-xs text-slate-400">
-                        {formatDateTimeShort(fill.ts)} · {fill.marketType}
+                        {formatDateTimeShort(fill.ts)} - {fill.marketType}
                       </p>
                     </div>
                     <span className={`badge ${fill.side === "long" ? "badge-positive" : "badge-negative"}`}>
@@ -147,7 +147,7 @@ export function TradesPage() {
                     <div>
                       <p className="text-sm font-semibold text-slate-100">{trade.symbol}</p>
                       <p className="text-xs text-slate-400">
-                        {formatDateTimeShort(trade.closeTs)} · {trade.side.toUpperCase()}
+                        {formatDateTimeShort(trade.closeTs)} - {trade.side.toUpperCase()}
                       </p>
                     </div>
                     <div className={`text-sm font-semibold ${trade.pnl >= 0 ? "text-profit" : "text-loss"}`}>

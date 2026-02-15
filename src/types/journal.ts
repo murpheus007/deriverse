@@ -1,4 +1,4 @@
-﻿export type JournalEntry = {
+export type JournalEntry = {
   id: string;
   createdAt: string;
   tradeRef?: string;

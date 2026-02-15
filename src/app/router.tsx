@@ -1,4 +1,4 @@
-﻿import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AppShell } from "./shell";
 import { RequireAuth } from "./RequireAuth";
 import { DashboardPage } from "../pages/DashboardPage";
