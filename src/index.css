@@ -290,6 +290,12 @@ body {
   background-color: var(--surface) !important;
 }
 
+.light .hover\:bg-slate-900\/60:hover,
+.light .hover\:bg-slate-900\/70:hover,
+.light .hover\:bg-slate-800\/70:hover {
+  background-color: var(--surface-muted) !important;
+}
+
 /* Add this once (works with any palette) */
 .nav-link {
   color: var(--text);
